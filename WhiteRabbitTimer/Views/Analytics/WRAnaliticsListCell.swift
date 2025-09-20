@@ -8,13 +8,15 @@
 import SwiftUI
 
 struct WRAnaliticsListCell: View {
-    var title: String
-    var color: Color
-    var iconName: String
+    var tag: WRTag
     var date: Date
     var body: some View {
         HStack {
-            WRTagListCell(title: title, color: color, iconName: iconName)
+            WRTagListCell(
+                title: tag.title,
+                color: tag.color.value,
+                iconName: tag.iconName
+            )
             Spacer()
             VStack(alignment: .trailing){
                 Text("\(date.formatted(.dateTime.day().month().year()))")
@@ -30,12 +32,9 @@ struct WRAnaliticsListCell: View {
 }
 
 #Preview {
+    let tag = WRTag(title: "Rainbow", color: .pink, iconName: "rainbow")
     NavigationLink(destination: Text("Default")) {
-        WRAnaliticsListCell(title: "Default",
-                            color: .pink,
-                            iconName: "rainbow",
-                            date: Date.now
-        )
+        WRAnaliticsListCell(tag: tag, date: Date.now)
         .padding()
     }
 }
