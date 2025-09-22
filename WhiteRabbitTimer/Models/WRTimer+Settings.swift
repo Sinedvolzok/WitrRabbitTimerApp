@@ -36,7 +36,7 @@ extension WRTimer {
                 title: "Default",
                 icon: .bird,
                 colorScheme: .greenRed,
-                phase: Phase(duration: 10, style: .countdown)
+                phase: Phase(duration: 20, style: .countdown)
             )
         }
         

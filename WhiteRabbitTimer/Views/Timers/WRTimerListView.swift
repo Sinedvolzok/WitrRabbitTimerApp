@@ -40,15 +40,17 @@ struct WRTimerListView: View {
                     Section(header: Text("\(section.title)")) {
                         ForEach(section.items, id: \.id) { item in
                             NavigationLink(value: item) {
-                                
-                                    
                                         switch item {
                                         case is WRTimer:
                                             EmptyView()
                                         case let templateItem as WRTemplate:
                                             WRTemplateCell(template: templateItem.settings)
                                         case let analyticsItem as WRAnalyticsItem:
-                                            WRAnalyticsCell(settings: analyticsItem.settings)
+                                            WRAnalyticsCell(
+                                                settings: analyticsItem.settings,
+                                                tag: analyticsItem.tags[0],
+                                                data: analyticsItem.startDate
+                                            )
                                         default:
                                             EmptyView()
                                         }

@@ -22,7 +22,7 @@ struct WRTagListCell: View {
                 Image(systemName: iconName)
                     .symbolRenderingMode(.monochrome)
             }
-            .font(.title3)
+            .font(.callout)
             .padding(.horizontal, 24)
             .padding(.vertical, 12)
             .foregroundStyle(color)

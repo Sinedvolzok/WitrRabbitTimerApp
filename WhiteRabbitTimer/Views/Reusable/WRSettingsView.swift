@@ -9,6 +9,8 @@ import SwiftUI
 
 struct WRSettingsView: View {
     var settings: WRTimer.Settings
+    var isActive: Bool = false
+    var currentActivePhase: Int? = nil
     private var maxRestValue: Double {
         let durations = settings.phases
             .filter({ $0.style == .rest })
@@ -61,7 +63,8 @@ struct WRSettingsView: View {
                     if maxRestValue != settings.phases[1].duration {
                         WRIntervalPhaseLabel(
                             value: maxRestValue,
-                            imageName: "water.waves.and.arrow.trianglehead.down"
+                            imageName: "water.waves.and.arrow.trianglehead.down",
+                            isActive: true
                         )
                     }
                 }

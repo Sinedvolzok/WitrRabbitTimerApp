@@ -33,6 +33,7 @@ struct WRAnaliticsListCell: View {
 
 #Preview {
     let tag = WRTag(title: "Rainbow", color: .pink, iconName: "rainbow")
+    
     NavigationLink(destination: Text("Default")) {
         WRAnaliticsListCell(tag: tag, date: Date.now)
         .padding()

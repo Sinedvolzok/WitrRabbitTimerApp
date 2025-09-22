@@ -9,16 +9,30 @@ import SwiftUI
 
 struct WRAnalyticsCell: View {
     var settings: WRTimer.Settings
-//    var data:
+    var tag: WRTag
+    var data: Date
     var body: some View {
-        HStack {
+        VStack(alignment: .leading) {
             WRSettingsView(settings: settings)
-        
+            WRAnaliticsListCell(tag: tag, date: data)
         }
     }
 }
 
 #Preview {
-    let settings = WRTimer.Settings()
-    WRAnalyticsCell(settings: settings)
+    let analyticsItem = WRAnalyticsItem(
+        settings: WRTimer.Settings(),
+        startDate: Date(),
+        tags: [WRTag(title: "RB", color: .pink, iconName: "rainbow")])
+    List {
+        NavigationLink {
+            Text("Sample link")
+        } label: {
+            WRAnalyticsCell(
+                settings: analyticsItem.settings,
+                tag: analyticsItem.tags[0],
+                data: analyticsItem.startDate
+            )
+        }
+    }
 }
