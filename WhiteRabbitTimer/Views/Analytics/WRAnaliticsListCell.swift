@@ -24,7 +24,6 @@ struct WRAnaliticsListCell: View {
                     "\(date.formatted(.dateTime.hour().minute().second()))"
                 )
             }
-            .padding()
             .foregroundStyle(.secondary)
             .font(.caption)
         }

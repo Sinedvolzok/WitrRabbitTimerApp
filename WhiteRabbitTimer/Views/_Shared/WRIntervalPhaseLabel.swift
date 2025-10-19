@@ -16,11 +16,11 @@ struct WRIntervalPhaseLabel: View {
         } icon: {
             Image(systemName: imageName)
         }
-        
+        .font(.caption)
         .padding(8)
         .background(
             Capsule()
-                .fill(isActive ? .thickMaterial : .ultraThinMaterial)
+                .fill(isActive ? .ultraThinMaterial : .thickMaterial)
                 .stroke(.foreground, style: .init(lineWidth: isActive ? 1 : 0))
         )
     }

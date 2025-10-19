@@ -12,10 +12,6 @@ struct WRTagListCell: View {
     var color: Color
     var iconName: String
     var body: some View {
-        NavigationLink {
-            Text("Link to \(title)")
-        }
-        label: {
             Label {
                 Text(title)
             } icon: {
@@ -23,15 +19,15 @@ struct WRTagListCell: View {
                     .symbolRenderingMode(.monochrome)
             }
             .font(.callout)
-            .padding(.horizontal, 24)
-            .padding(.vertical, 12)
+            .labelStyle(.titleOnly)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
             .foregroundStyle(color)
             .background(
                 Capsule(style: .circular)
                     .fill(color)
                     .opacity(0.4)
             )
-        }
     }
 }
 

@@ -40,34 +40,41 @@ struct WRTimerListView: View {
                     Section(header: Text("\(section.title)")) {
                         ForEach(section.items, id: \.id) { item in
                             NavigationLink(value: item) {
-                                        switch item {
-                                        case is WRTimer:
-                                            EmptyView()
-                                        case let templateItem as WRTemplate:
-                                            WRTemplateCell(template: templateItem.settings)
-                                        case let analyticsItem as WRAnalyticsItem:
-                                            WRAnalyticsCell(
-                                                settings: analyticsItem.settings,
-                                                tag: analyticsItem.tags[0],
-                                                data: analyticsItem.startDate
-                                            )
-                                        default:
-                                            EmptyView()
-                                        }
-                                    
-                                    Image(systemName: "play")
-                                
+                                switch item {
+                                case let activeItem as WRTimer:
+                                    WRActiveTimerCell(
+                                        settings: activeItem.settings,
+                                        state: activeItem.state
+                                    )
+                                case let templateItem as WRTemplate:
+                                    WRSettingsView(settings: templateItem.settings)
+                                case let analyticsItem as WRAnalyticsItem:
+                                    WRAnalyticsCell(
+                                        settings: analyticsItem.settings,
+                                        tag: analyticsItem.tags[0],
+                                        data: analyticsItem.startDate
+                                    )
+                                default:
+                                    EmptyView()
+                                }
                             }
                         }
+                        .onDelete(perform: deleteItems)
                     }
                 }
             }
+//            .onDelete(perform: deleteItems)
             .toolbar {
                 ToolbarItem {
                     Button(action: addItem) {
                         Label("Add Item", systemImage: "plus")
                     }
                 }
+#if os(iOS)
+                ToolbarItem {
+                    EditButton()
+                }
+#endif
             }
             .navigationDestination(for: WRTemplate.self) { timer in
                 Text("From Templates: \(timer.settings.title)")
@@ -82,8 +89,10 @@ struct WRTimerListView: View {
                         modelContext.insert(runningTimer)
                     }
             }
+            .navigationTitle("Timers")
             .navigationDestination(for: WRTimer.self) { timer in
                 Text("From Timers: \(timer.settings.title)")
+                WRTimerView(timer: timer)
             }
             .navigationDestination(for: WRAnalyticsItem.self) { timer in
                 Text("From Analithics: \(timer.settings.title)")

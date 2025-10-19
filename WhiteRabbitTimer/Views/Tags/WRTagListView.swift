@@ -41,6 +41,7 @@ struct WRTagListView: View {
                 }
                 .onDelete(perform: deleteItems)
             }
+            .navigationTitle("Tags")
 #if os(macOS)
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
 #endif

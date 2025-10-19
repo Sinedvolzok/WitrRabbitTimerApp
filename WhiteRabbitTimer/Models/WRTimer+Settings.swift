@@ -64,7 +64,7 @@ extension WRTimer {
             ]
             let longInterval: [WRTimer.Settings.Phase] = [
                 .init(duration: actionValue, style: .action),
-                .init(duration: longRestValue, style: .rest)
+                .init(duration: longRestValue, style: .longRest)
             ]
             var phases: [WRTimer.Settings.Phase] = []
             for _ in 1..<evryThIsLong {
@@ -83,8 +83,19 @@ extension WRTimer {
             enum Style: String, Codable {
                 case countdown
                 case rest
+                case longRest
                 case action
                 case stopwatch
+                
+                var iconName: String {
+                    switch self {
+                    case .countdown: return "timer"
+                    case .rest: return "water.waves"
+                    case .longRest: return "water.waves.and.arrow.trianglehead.down"
+                    case .action: return "flame.fill"
+                    case .stopwatch: return "stopwatch"
+                    }
+                }
             }
         }
     }

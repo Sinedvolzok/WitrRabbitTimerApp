@@ -42,6 +42,7 @@ struct WRTemplateCell: View {
             }
         }
     }
+    
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             WRLabel(template: template)
@@ -107,7 +108,7 @@ struct WRChartItem: View {
     var style: WRTimer.Settings.Phase.Style
     
     var mappedDuration: CGFloat {
-        CGFloat(duration) / CGFloat(maxDuration) * 50
+        CGFloat(duration) / CGFloat(maxDuration) * 50 + 10
     }
     var body: some View {
         VStack {

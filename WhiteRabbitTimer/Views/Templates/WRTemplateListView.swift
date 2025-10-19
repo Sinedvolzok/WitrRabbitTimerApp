@@ -21,6 +21,7 @@ struct WRTemplateListView: View {
                 }
                 .onDelete(perform: deleteItems)
             }
+            .navigationTitle("Templates")
 #if os(macOS)
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
 #endif

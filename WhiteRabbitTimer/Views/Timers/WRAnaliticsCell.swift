@@ -12,7 +12,7 @@ struct WRAnalyticsCell: View {
     var tag: WRTag
     var data: Date
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 24) {
             WRSettingsView(settings: settings)
             WRAnaliticsListCell(tag: tag, date: data)
         }
@@ -23,7 +23,7 @@ struct WRAnalyticsCell: View {
     let analyticsItem = WRAnalyticsItem(
         settings: WRTimer.Settings(),
         startDate: Date(),
-        tags: [WRTag(title: "RB", color: .pink, iconName: "rainbow")])
+        tags: [WRTag(title: "Rainbow", color: .pink, iconName: "rainbow")])
     List {
         NavigationLink {
             Text("Sample link")
@@ -34,5 +34,7 @@ struct WRAnalyticsCell: View {
                 data: analyticsItem.startDate
             )
         }
+        .padding()
     }
+    
 }

@@ -198,6 +198,7 @@ struct WRTemplateSettingsView: View {
                 } header: { Text("time") }
             }
             .navigationTitle("Setup")
+#if os(iOS)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -246,6 +247,7 @@ struct WRTemplateSettingsView: View {
                     }
                 }
             }
+#endif // os(iOS)
         }
     }
 }

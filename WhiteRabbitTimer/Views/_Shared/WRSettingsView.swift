@@ -9,23 +9,24 @@ import SwiftUI
 
 struct WRSettingsView: View {
     var settings: WRTimer.Settings
-    var isActive: Bool = false
     var currentActivePhase: Int? = nil
-    private var maxRestValue: Double {
-        let durations = settings.phases
-            .filter({ $0.style == .rest })
-            .map(\.duration)
-        guard !durations.isEmpty, let last = durations.last else { return 0 }
-        return max(durations[1], last)
+    var isActive: Bool {
+        currentActivePhase != nil
     }
-    private var maxDuration: Double {
-        settings.phases.map(\.duration).max() ?? 0
+    private var maxRestValue: Double? {
+        settings.phases.first(where: { $0.style == .longRest })?.duration
     }
     private var actionValue: Double {
         settings.phases[0].duration
     }
     private var restValue: Double {
         settings.phases[1].duration
+    }
+    private var currentPhaseStyle: WRTimer.Settings.Phase.Style {
+        if let active = currentActivePhase {
+            return settings.phases[active].style
+        }
+        return .countdown
     }
     enum TimerViewStyle {
         case interval
@@ -54,19 +55,23 @@ struct WRSettingsView: View {
                         .padding(.trailing, 4)
                     WRIntervalPhaseLabel(
                         value: actionValue,
-                        imageName: "flame"
+                        imageName: WRTimer.Settings.Phase.Style.action.iconName,
+                        isActive: currentPhaseStyle == .action
                     )
                     WRIntervalPhaseLabel(
                         value: restValue,
-                        imageName: "water.waves"
+                        imageName: WRTimer.Settings.Phase.Style.rest.iconName,
+                        isActive: currentPhaseStyle == .rest
                     )
-                    if maxRestValue != settings.phases[1].duration {
+                    
+                    if let maxRestValue {
                         WRIntervalPhaseLabel(
                             value: maxRestValue,
-                            imageName: "water.waves.and.arrow.trianglehead.down",
-                            isActive: true
+                            imageName: WRTimer.Settings.Phase.Style.longRest.iconName,
+                            isActive: currentPhaseStyle == .longRest
                         )
                     }
+                    
                 }
                 .foregroundStyle(.secondary)
             case .single:
@@ -121,14 +126,16 @@ struct WRSettingsView: View {
             .init(duration: 20, style: .action),
             .init(duration: 5, style: .rest),
             .init(duration: 20, style: .action),
-            .init(duration: 15, style: .rest),
+            .init(duration: 15, style: .longRest),
         ]
     )
     NavigationStack {
         List {
             WRSettingsView(settings: templateStopWatch)
-            WRSettingsView(settings: templateInterval)
-            WRSettingsView(settings: templateIntervalWithLongRest)
+            WRSettingsView(settings: templateInterval,
+                           currentActivePhase: 0)
+            WRSettingsView(settings: templateIntervalWithLongRest,
+                           currentActivePhase: 5)
         }
     }
 }

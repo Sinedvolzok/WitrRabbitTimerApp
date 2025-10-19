@@ -15,17 +15,26 @@ struct WRanalyticsListView: View {
         NavigationSplitView {
             List {
                 ForEach(items) { item in
-                    NavigationLink {
-                        Text("Analytics Item at \(item.startDate.formatted())")
-                    } label: {
-                        Text(item.settings.title)
-                            .background(
-                                Capsule()
-                                .fill(item.settings.colorScheme.value.0))
+                    HStack {
+                        WRTagListCell(
+                            title: item.tags[0].title,
+                            color: item.tags[0].color.value,
+                            iconName: item.tags[0].iconName
+                        )
+                        Spacer()
+                        VStack(alignment: .trailing){
+                            Text("\(item.startDate.formatted(.dateTime.day().month().year()))")
+                            Text(
+                                "\(item.startDate.formatted(.dateTime.hour().minute().second()))"
+                            )
+                        }
+                        .foregroundStyle(.secondary)
+                        .font(.caption)
                     }
                 }
                 .onDelete(perform: deleteItems)
             }
+            .navigationTitle("Analytics")
 #if os(macOS)
             .navigationSplitViewColumnWidth(min: 180, ideal: 200)
 #endif

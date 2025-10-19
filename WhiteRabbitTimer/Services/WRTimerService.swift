@@ -15,29 +15,37 @@ final class WRTimerService: Sendable {
     var timerHandler: Cancellable? = nil
     var timer = Timer.publish(every: 1, on: .main, in: .default)
     
-    var instance: WRTimer = WRTimer.defaultValue
+    var instance: WRTimer = .defaultValue
     
     var currentSettings: WRTimer.Settings.Phase {
         instance.settings.phases[instance.state.currentSettingsIteration]
     }
     
-    internal func setup(for instance: WRTimer) {
-        self.instance = instance
-        if instance.state.isRunning { startTimer() }
-    }
-    
-    internal func startTimer() {
+    private func startTimer() {
         instance.state.isRunning = true
         timer = Timer.publish(every: 1, on: .main, in: .default)
         timerHandler = timer.connect()
     }
     
-    internal func stopTimer() {
+    private func stopTimer() {
         timerHandler?.cancel()
         timerHandler = nil
     }
     
-    internal func stop() {
+    func setup(for instance: WRTimer) {
+        self.instance = instance
+        if instance.state.isRunning { startTimer() }
+    }
+    
+    func start() {
+        startTimer()
+    }
+    
+    func pause() {
+        stopTimer()
+    }
+    
+    func stop() {
         stopTimer()
         instance.state.isRunning = false
         instance.state.disappearTime = nil
@@ -45,7 +53,7 @@ final class WRTimerService: Sendable {
         nextIteration()
     }
     
-    internal func run() {
+    func run() {
         if instance.state.elapsed < currentSettings.duration,
            instance.state.isRunning == true
         {
@@ -55,7 +63,7 @@ final class WRTimerService: Sendable {
         }
     }
     
-    internal func nextIteration() {
+    func nextIteration() {
         instance.state.currentSettingsIteration += 1
         instance.state.currentSettingsIteration = instance.state.currentSettingsIteration
         % instance.settings.phases.count

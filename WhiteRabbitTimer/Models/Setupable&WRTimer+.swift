@@ -81,7 +81,6 @@ extension WRTimer {
         case pawprint = "pawprint"
         case umbrella = "umbrella"
         case flag = "flag"
-        // Add more SF Symbol names as needed
         
         var image: Image {
             Image(systemName: self.rawValue)
@@ -92,41 +91,40 @@ extension WRTimer {
 // MARK: - WRTimer.ColorScheme
 
 extension WRTimer {
-    enum ColorScheme: String, CaseIterable, Codable, Hashable, Identifiable {
-        case blueGray
-        case cyanPink
-        case tealMint
-        case purpleYellow
-        case indigoOrange
-        case greenRed
-        case pinkBlue
-        case orangeTeal
-        case yellowBlue
+    enum ColorScheme: String, CaseIterable, Codable, Hashable {
+        case blueGray = "blueGray"
+        case cyanPink = "cyanPink"
+        case tealMint = "tealMint"
+        case purpleYellow = "purpleYellow"
+        case indigoOrange = "indigoOrange"
+        case greenRed = "greenRed"
+        case pinkBlue = "pinkBlue"
+        case orangeTeal = "orangeTeal"
+        case yellowBlue = "yellowBlue"
+    }
+}
 
-        var id: String { rawValue }
-        
-        var value: (Color, Color) {
-            switch self {
-            case .blueGray:
-                return (Color.blue, Color.gray)
-            case .cyanPink:
-                return (Color.cyan, Color.pink)
-            case .tealMint:
-                return (Color.teal, Color.mint)
-            case .purpleYellow:
-                return (Color.purple, Color.yellow)
-            case .indigoOrange:
-                return (Color.indigo, Color.orange)
-            case .greenRed:
-                return (Color.green, Color.red)
-            case .pinkBlue:
-                return (Color.pink, Color.blue)
-            case .orangeTeal:
-                return (Color.orange, Color.teal)
-            case .yellowBlue:
-                return (Color.yellow, Color.blue)
-            }
+extension WRTimer.ColorScheme {
+    var value: (Color, Color) {
+        switch self {
+        case .blueGray:
+            return (Color.blue, Color.gray)
+        case .cyanPink:
+            return (Color.cyan, Color.pink)
+        case .tealMint:
+            return (Color.teal, Color.mint)
+        case .purpleYellow:
+            return (Color.purple, Color.yellow)
+        case .indigoOrange:
+            return (Color.indigo, Color.orange)
+        case .greenRed:
+            return (Color.green, Color.red)
+        case .pinkBlue:
+            return (Color.pink, Color.blue)
+        case .orangeTeal:
+            return (Color.orange, Color.teal)
+        case .yellowBlue:
+            return (Color.yellow, Color.blue)
         }
     }
 }
-// End of WRTimer.ColorScheme restoration
