@@ -15,14 +15,13 @@ enum TimerState {
 struct ControlButtonsView: View {
     @Binding var timerState: TimerState
     @Binding var isShowingSettings: Bool
-    @State private var isPaused: Bool = true
+    var isPaused: Bool { timerState != .started }
     var body: some View {
 //        DStack(spacing: 24, isOpposite: true) {
         HStack(spacing: 24) {
             Group {
                 Button {
                     timerState = .stopped
-                    isPaused = true
                 } label: {
                     Image(systemName: "arrow.counterclockwise")
                         .fontWeight(.semibold)
@@ -31,12 +30,11 @@ struct ControlButtonsView: View {
                 .disabled(timerState == .stopped)
                 Button {
                     switch timerState {
-                    case .paused,.stopped:
+                    case .stopped, .paused:
                         timerState = .started
                     case .started:
                         timerState = .paused
                     }
-                    isPaused.toggle()
                 } label: {
                     Image(systemName: isPaused ? "play.fill" : "pause.fill")
                         .font(.system(size: 36.0))

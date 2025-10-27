@@ -13,11 +13,20 @@ struct WRTimerView: View {
     @State private var timerState: TimerState = .stopped
     @State private var isShowingSettings: Bool = false
     private var pending: Double {
-        timer.settings
-            .phases[timer.state.currentSettingsIteration].duration - timer.state.elapsed
+        timer.settings.phases[timer.state.currentSettingsIteration].duration
+        - timer.state.elapsed
     }
     private var phaseStyle: WRTimer.Settings.Phase.Style {
         timer.settings.phases[timer.state.currentSettingsIteration].style
+    }
+    
+    private var currentPhaseDuration: Double {
+        timer.settings.phases[timer.state.currentSettingsIteration].duration
+    }
+    private var formattedPending: String {
+        let duration = Duration.seconds(pending)
+        let formatted = duration.formatted(.time(pattern: .minuteSecond))
+        return formatted
     }
     var body: some View {
         
@@ -38,19 +47,10 @@ struct WRTimerView: View {
             }
             .ignoresSafeArea()
             VStack(alignment: .center, spacing: 100) {
-                Gauge(
-                    value: pending,
-                    in: 0.0...timer.settings.phases[timer.state.currentSettingsIteration].duration
-                ) {
-                    Text("hello")
-                } currentValueLabel: {
-                    Text(String(format: "%.0f", pending))
-                } minimumValueLabel: {
-                    Text("0")
-                } maximumValueLabel: {
-                    Text(String(format: "%.0f", timer.settings.phases[timer.state.currentSettingsIteration].duration))
-                }
-                .gaugeStyle(.accessoryCircularCapacity)
+                Spacer()
+                Text(formattedPending).font(.largeTitle)
+                WRCircularIndicatorView(pending: pending, duration: currentPhaseDuration)
+                    .padding(40)
                 ControlButtonsView(
                     timerState: $timerState,
                     isShowingSettings: $isShowingSettings
@@ -59,10 +59,10 @@ struct WRTimerView: View {
             .onAppear {
                 service.setup(for: timer)
             }
-            .onReceive(service.timer) { timer in
+            .onReceive(service.timer) { _ in
                 service.run()
             }
-            .onChange(of: timerState) { _,_ in
+            .onChange(of: timerState) { _, _ in
                 switch timerState {
                 case .stopped:
                     service.stop()
@@ -70,6 +70,13 @@ struct WRTimerView: View {
                     service.start()
                 case .paused:
                     service.pause()
+                }
+            }
+            .onChange(of: timer.state.elapsed) { _, _ in
+                if timer.state.elapsed == 0 {
+                    print(timer.state.currentSettingsIteration)
+                    timerState = .paused
+                    service.nextIteration()
                 }
             }
         }
@@ -84,12 +91,12 @@ struct WRTimerView: View {
                     icon: .book,
                     colorScheme: .greenRed,
                     phases: [
-                        .init(duration: 20, style: .action),
-                        .init(duration: 10, style: .rest),
-                        .init(duration: 20, style: .action),
-                        .init(duration: 10, style: .rest),
-                        .init(duration: 20, style: .action),
-                        .init(duration: 15, style: .longRest)
+                        .init(duration: 2*6, style: .action),
+                        .init(duration: 1*6, style: .rest),
+                        .init(duration: 2*6, style: .action),
+                        .init(duration: 1*6, style: .rest),
+                        .init(duration: 2*6, style: .action),
+                        .init(duration: 3*6, style: .longRest)
                     ]
         )
     )

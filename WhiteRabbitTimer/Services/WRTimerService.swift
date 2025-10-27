@@ -50,7 +50,7 @@ final class WRTimerService: Sendable {
         instance.state.isRunning = false
         instance.state.disappearTime = nil
         instance.state.elapsed = 0
-        nextIteration()
+        instance.state.currentSettingsIteration = 0
     }
     
     func run() {
@@ -59,13 +59,16 @@ final class WRTimerService: Sendable {
         {
             instance.state.elapsed += currentSettings.interval
         } else {
-            stop()
+            stopTimer()
+            instance.state.disappearTime = nil
+            instance.state.elapsed = 0
         }
     }
     
     func nextIteration() {
         instance.state.currentSettingsIteration += 1
-        instance.state.currentSettingsIteration = instance.state.currentSettingsIteration
-        % instance.settings.phases.count
+        let phasesCount = instance.settings.phases.count
+        let currentIteration = instance.state.currentSettingsIteration
+        instance.state.currentSettingsIteration = currentIteration % phasesCount
     }
 }

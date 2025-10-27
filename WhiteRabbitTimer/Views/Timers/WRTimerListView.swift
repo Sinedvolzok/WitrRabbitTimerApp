@@ -13,22 +13,28 @@ struct WRTimerListView: View {
     @Query(sort: \WRTemplate.settings.title) private var templates: [WRTemplate]
     @Query(sort: \WRAnalyticsItem.settings.title) private var items: [WRAnalyticsItem]
     
-    struct SetupableSection: Identifiable {
-        let id: UUID = UUID()
-        let title: String
-        let items: [any Setupable]
+    private func createTimer(from template: WRTemplate) -> WRTimer {
+        let item = WRAnalyticsItem(
+            settings: template.settings,
+            startDate: .now,
+            tags: [WRTag(title: "templates test", color: .pink, iconName: "tag")]
+        )
+        modelContext.insert(item)
+        let runningTimer = WRTimer(settings: template.settings)
+        modelContext.insert(runningTimer)
+        return runningTimer
     }
     
-    private var sections: [SetupableSection] {
-        [
-            SetupableSection(title: "Running Timers", items: timers),
-            SetupableSection(title: "Templates", items: templates),
-            SetupableSection(title: "Resent Timers", items: items)
-        ]
-    }
-    
-    private var stuff: [any Setupable] {
-        timers + templates + items
+    private func createTimer(from anlyticsItem: WRAnalyticsItem) -> WRTimer {
+        let item = WRAnalyticsItem(
+            settings: anlyticsItem.settings,
+            startDate: .now,
+            tags: [WRTag(title: "analitics test", color: .pink, iconName: "tag")]
+        )
+        modelContext.insert(item)
+        let runningTimer = WRTimer(settings: anlyticsItem.settings)
+        modelContext.insert(runningTimer)
+        return runningTimer
     }
     
     @State private var singleSelection: UUID?
@@ -36,76 +42,76 @@ struct WRTimerListView: View {
     var body: some View {
         NavigationStack {
             List(selection: $singleSelection) {
-                ForEach(sections) { section in
-                    Section(header: Text("\(section.title)")) {
-                        ForEach(section.items, id: \.id) { item in
-                            NavigationLink(value: item) {
-                                switch item {
-                                case let activeItem as WRTimer:
-                                    WRActiveTimerCell(
-                                        settings: activeItem.settings,
-                                        state: activeItem.state
-                                    )
-                                case let templateItem as WRTemplate:
-                                    WRSettingsView(settings: templateItem.settings)
-                                case let analyticsItem as WRAnalyticsItem:
-                                    WRAnalyticsCell(
-                                        settings: analyticsItem.settings,
-                                        tag: analyticsItem.tags[0],
-                                        data: analyticsItem.startDate
-                                    )
-                                default:
-                                    EmptyView()
-                                }
+                // Running Timers
+                Section(header: Text("Running Timers")) {
+                    ForEach(timers) { activeItem in
+                        NavigationLink(value: activeItem) {
+                            WRActiveTimerCell(
+                                settings: activeItem.settings,
+                                state: activeItem.state
+                            )
+                        }
+                    }
+                    .onDelete { offsets in
+                        withAnimation {
+                            for index in offsets where index < timers.count {
+                                modelContext.delete(timers[index])
                             }
                         }
-                        .onDelete(perform: deleteItems)
                     }
                 }
+
+                // Templates
+                Section(header: Text("Templates")) {
+                    ForEach(templates) { templateItem in
+                        NavigationLink(value: templateItem) {
+                            WRSettingsView(settings: templateItem.settings)
+                        }
+                    }
+                    .onDelete { offsets in
+                        withAnimation {
+                            for index in offsets where index < templates.count {
+                                modelContext.delete(templates[index])
+                            }
+                        }
+                    }
+                }
+
+                // Recent Timers
+                Section(header: Text("Resent Timers")) {
+                    ForEach(items) { analyticsItem in
+                        NavigationLink(value: analyticsItem) {
+                            WRAnalyticsCell(
+                                settings: analyticsItem.settings,
+                                tag: analyticsItem.tags.first!,
+                                data: analyticsItem.startDate
+                            )
+                        }
+                    }
+                    .onDelete(perform: deleteItems)
+                }
             }
-//            .onDelete(perform: deleteItems)
             .toolbar {
                 ToolbarItem {
                     Button(action: addItem) {
                         Label("Add Item", systemImage: "plus")
                     }
                 }
-#if os(iOS)
+    #if os(iOS)
                 ToolbarItem {
                     EditButton()
                 }
-#endif
-            }
-            .navigationDestination(for: WRTemplate.self) { timer in
-                Text("From Templates: \(timer.settings.title)")
-                    .onAppear {
-                        let item = WRAnalyticsItem(
-                            settings: timer.settings,
-                            startDate: .now,
-                            tags: [WRTag(title: "templates test", color: .pink, iconName: "tag")]
-                        )
-                        modelContext.insert(item)
-                        let runningTimer = WRTimer(settings: timer.settings)
-                        modelContext.insert(runningTimer)
-                    }
+    #endif
             }
             .navigationTitle("Timers")
+            .navigationDestination(for: WRTemplate.self) { template in
+                WRTimerView(timer: createTimer(from: template))
+            }
             .navigationDestination(for: WRTimer.self) { timer in
-                Text("From Timers: \(timer.settings.title)")
                 WRTimerView(timer: timer)
             }
-            .navigationDestination(for: WRAnalyticsItem.self) { timer in
-                Text("From Analithics: \(timer.settings.title)")
-                    .onAppear {
-                        let item = WRAnalyticsItem(
-                            settings: timer.settings,
-                            startDate: .now,
-                            tags: [WRTag(title: "analitics test", color: .pink, iconName: "tag")]
-                        )
-                        modelContext.insert(item)
-                        let runningTimer = WRTimer(settings: timer.settings)
-                        modelContext.insert(runningTimer)
-                    }
+            .navigationDestination(for: WRAnalyticsItem.self) { analyticsItem in
+                WRTimerView(timer: createTimer(from: analyticsItem))
             }
         }
     }
@@ -118,8 +124,9 @@ struct WRTimerListView: View {
     }
     
     private func deleteItems(offsets: IndexSet) {
+        print("Offsets to delete: \(offsets), items count: \(items.count)")
         withAnimation {
-            for index in offsets {
+            for index in offsets where index < items.count {
                 modelContext.delete(items[index])
             }
         }
