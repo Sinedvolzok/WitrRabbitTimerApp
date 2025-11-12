@@ -13,6 +13,8 @@ struct WRTimerListView: View {
     @Query(sort: \WRTemplate.settings.title) private var templates: [WRTemplate]
     @Query(sort: \WRAnalyticsItem.settings.title) private var items: [WRAnalyticsItem]
     
+    @State private var path = NavigationPath()
+    
     private func createTimer(from template: WRTemplate) -> WRTimer {
         let item = WRAnalyticsItem(
             settings: template.settings,
@@ -40,7 +42,7 @@ struct WRTimerListView: View {
     @State private var singleSelection: UUID?
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             List(selection: $singleSelection) {
                 // Running Timers
                 Section(header: Text("Running Timers")) {
@@ -64,7 +66,10 @@ struct WRTimerListView: View {
                 // Templates
                 Section(header: Text("Templates")) {
                     ForEach(templates) { templateItem in
-                        NavigationLink(value: templateItem) {
+                        Button {
+                            let timer = createTimer(from: templateItem)
+                            path.append(timer)
+                        } label: {
                             WRSettingsView(settings: templateItem.settings)
                         }
                     }
@@ -81,11 +86,16 @@ struct WRTimerListView: View {
                 Section(header: Text("Resent Timers")) {
                     ForEach(items) { analyticsItem in
                         NavigationLink(value: analyticsItem) {
-                            WRAnalyticsCell(
-                                settings: analyticsItem.settings,
-                                tag: analyticsItem.tags.first!,
-                                data: analyticsItem.startDate
-                            )
+                            Button {
+                                let timer = createTimer(from: analyticsItem)
+                                path.append(timer)
+                            } label: {
+                                WRAnalyticsCell(
+                                    settings: analyticsItem.settings,
+                                    tag: analyticsItem.tags.first!,
+                                    data: analyticsItem.startDate
+                                )
+                            }
                         }
                     }
                     .onDelete(perform: deleteItems)
@@ -97,6 +107,11 @@ struct WRTimerListView: View {
                         Label("Add Item", systemImage: "plus")
                     }
                 }
+                ToolbarItem {
+                    Button(action: deleteAllTimersAndAnalytics) {
+                        Label("Clean Items", systemImage: "trash")
+                    }
+                }
     #if os(iOS)
                 ToolbarItem {
                     EditButton()
@@ -104,22 +119,29 @@ struct WRTimerListView: View {
     #endif
             }
             .navigationTitle("Timers")
-            .navigationDestination(for: WRTemplate.self) { template in
-                WRTimerView(timer: createTimer(from: template))
-            }
             .navigationDestination(for: WRTimer.self) { timer in
                 WRTimerView(timer: timer)
             }
-            .navigationDestination(for: WRAnalyticsItem.self) { analyticsItem in
-                WRTimerView(timer: createTimer(from: analyticsItem))
-            }
         }
+    }
+    
+    private func willNavigateToDetailView() {
+        print("Cell will navigate to detail view")
     }
     
     private func addItem() {
         withAnimation {
             let newItem = WRTimer.defaultValue
             modelContext.insert(newItem)
+        }
+    }
+    
+    private func deleteAllTimersAndAnalytics() {
+        do {
+            try modelContext.delete(model: WRTimer.self)
+            try modelContext.delete(model: WRAnalyticsItem.self)
+        } catch {
+            print("Error deleting: \(error.localizedDescription)")
         }
     }
     
@@ -139,3 +161,4 @@ struct WRTimerListView: View {
         .modelContainer(for: WRTimer.self, inMemory: true)
         .modelContainer(for: WRAnalyticsItem.self, inMemory: true)
 }
+
