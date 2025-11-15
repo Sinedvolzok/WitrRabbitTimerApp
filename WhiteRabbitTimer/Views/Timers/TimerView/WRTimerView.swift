@@ -10,7 +10,7 @@ import SwiftUI
 struct WRTimerView: View {
     var timer: WRTimer
     @State private var service = WRTimerService()
-    @State private var timerState: TimerState = .stopped
+    @State private var timerState: WRTimer.Status = .stopped
     @State private var isShowingSettings: Bool = false
     private var pending: Double {
         timer.settings.phases[timer.state.currentSettingsIteration].duration

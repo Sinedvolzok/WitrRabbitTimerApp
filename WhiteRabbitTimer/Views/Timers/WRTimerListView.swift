@@ -15,30 +15,6 @@ struct WRTimerListView: View {
     
     @State private var path = NavigationPath()
     
-    private func createTimer(from template: WRTemplate) -> WRTimer {
-        let item = WRAnalyticsItem(
-            settings: template.settings,
-            startDate: .now,
-            tags: [WRTag(title: "templates test", color: .pink, iconName: "tag")]
-        )
-        modelContext.insert(item)
-        let runningTimer = WRTimer(settings: template.settings)
-        modelContext.insert(runningTimer)
-        return runningTimer
-    }
-    
-    private func createTimer(from anlyticsItem: WRAnalyticsItem) -> WRTimer {
-        let item = WRAnalyticsItem(
-            settings: anlyticsItem.settings,
-            startDate: .now,
-            tags: [WRTag(title: "analitics test", color: .pink, iconName: "tag")]
-        )
-        modelContext.insert(item)
-        let runningTimer = WRTimer(settings: anlyticsItem.settings)
-        modelContext.insert(runningTimer)
-        return runningTimer
-    }
-    
     @State private var singleSelection: UUID?
     
     var body: some View {
@@ -90,11 +66,13 @@ struct WRTimerListView: View {
                                 let timer = createTimer(from: analyticsItem)
                                 path.append(timer)
                             } label: {
-                                WRAnalyticsCell(
-                                    settings: analyticsItem.settings,
-                                    tag: analyticsItem.tags.first!,
-                                    data: analyticsItem.startDate
-                                )
+                                if let firstItem = analyticsItem.tags.first {
+                                    WRAnalyticsCell(
+                                        settings: analyticsItem.settings,
+                                        tag: firstItem,
+                                        data: analyticsItem.startDate
+                                    )
+                                }
                             }
                         }
                     }
@@ -123,6 +101,18 @@ struct WRTimerListView: View {
                 WRTimerView(timer: timer)
             }
         }
+    }
+    
+    private func createTimer(from template: some Setupable) -> WRTimer {
+        let item = WRAnalyticsItem(
+            settings: template.settings,
+            startDate: .now,
+            tags: [WRTag(title: "templates test", color: .pink, iconName: "tag")]
+        )
+        modelContext.insert(item)
+        let runningTimer = WRTimer(settings: template.settings)
+        modelContext.insert(runningTimer)
+        return runningTimer
     }
     
     private func willNavigateToDetailView() {

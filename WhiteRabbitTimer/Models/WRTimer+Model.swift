@@ -17,7 +17,7 @@ final class WRTimer: Setupable {
     var state: State
     var settings: Settings
     
-    init(state: State = .init(isRunning: false, elapsed: 0),
+    init(state: State = .init(status: .stopped, elapsed: 0),
          settings: Settings) {
         self.state = state
         self.settings = settings
@@ -25,7 +25,7 @@ final class WRTimer: Setupable {
     
     static var defaultValue: WRTimer {
         WRTimer(
-            state: State(isRunning: false, elapsed: 0),
+            state: State(status: .stopped, elapsed: 0),
             settings: Settings(
                 title: "Default",
                 icon: .stopwatch,
@@ -44,13 +44,13 @@ extension WRTimer {
     @Model
     final class State {
         var id: UUID = UUID()
-        var isRunning: Bool
+        var status: String
         var elapsed: Double
         var disappearTime: Date?
         var currentSettingsIteration: Int = 0
         
-        init(isRunning: Bool, elapsed: Double) {
-            self.isRunning = isRunning
+        init(status: Status, elapsed: Double) {
+            self.status = status.rawValue
             self.elapsed = elapsed
         }
         
@@ -63,7 +63,16 @@ extension WRTimer {
         }
         
         internal func rememberTimeOnRunning() {
-            if isRunning { disappearTime = .now }
+            if status != Status.stopped.rawValue { disappearTime = .now }
         }
+    }
+}
+
+// MARK: - WRTimer.Status
+extension WRTimer {
+    enum Status: String, Codable {
+        case stopped
+        case started
+        case paused
     }
 }

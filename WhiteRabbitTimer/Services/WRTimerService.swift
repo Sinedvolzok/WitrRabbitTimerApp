@@ -22,7 +22,7 @@ final class WRTimerService: Sendable {
     }
     
     private func startTimer() {
-        instance.state.isRunning = true
+        instance.state.status = WRTimer.Status.started.rawValue
         timer = Timer.publish(every: 1, on: .main, in: .default)
         timerHandler = timer.connect()
     }
@@ -34,7 +34,9 @@ final class WRTimerService: Sendable {
     
     func setup(for instance: WRTimer) {
         self.instance = instance
-        if instance.state.isRunning { startTimer() }
+        if instance.state.status != WRTimer.Status.stopped.rawValue {
+            startTimer()
+        }
     }
     
     func start() {
@@ -47,7 +49,7 @@ final class WRTimerService: Sendable {
     
     func stop() {
         stopTimer()
-        instance.state.isRunning = false
+        instance.state.status = WRTimer.Status.stopped.rawValue
         instance.state.disappearTime = nil
         instance.state.elapsed = 0
         instance.state.currentSettingsIteration = 0
@@ -55,7 +57,7 @@ final class WRTimerService: Sendable {
     
     func run() {
         if instance.state.elapsed < currentSettings.duration,
-           instance.state.isRunning == true
+           instance.state.status != WRTimer.Status.stopped.rawValue
         {
             instance.state.elapsed += currentSettings.interval
         } else {

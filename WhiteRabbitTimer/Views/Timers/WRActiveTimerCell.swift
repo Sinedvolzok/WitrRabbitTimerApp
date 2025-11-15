@@ -49,7 +49,7 @@ struct WRActiveTimerCell: View {
 #Preview {
     let activeInterval = WRTimer(
         state: WRTimer.State(
-            isRunning: true,
+            status: .stopped,
             elapsed: 4),
         settings: WRTimer.Settings(
             title: "Title",
@@ -63,7 +63,7 @@ struct WRActiveTimerCell: View {
         )
     let activeSingle = WRTimer(
         state: WRTimer.State(
-            isRunning: true,
+            status: .stopped,
             elapsed: 12),
         settings: WRTimer.Settings())
     List {

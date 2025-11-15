@@ -13,7 +13,7 @@ enum TimerState {
 }
 
 struct ControlButtonsView: View {
-    @Binding var timerState: TimerState
+    @Binding var timerState: WRTimer.Status
     @Binding var isShowingSettings: Bool
     var isPaused: Bool { timerState != .started }
     var body: some View {
@@ -57,7 +57,7 @@ struct ControlButtonsView: View {
 }
 
 #Preview {
-    @Previewable @State var timerState: TimerState = .stopped
+    @Previewable @State var timerState: WRTimer.Status = .stopped
     @Previewable @State var isShowingSettings: Bool = false
     ZStack {
         Image("patternTest").resizable(
